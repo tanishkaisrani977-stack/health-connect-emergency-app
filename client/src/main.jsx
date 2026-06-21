@@ -4,7 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import gsap from 'gsap';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Activity, Ambulance, Bell, Building2, CheckCircle2, Clock, Crosshair, Expand, Gauge, HeartPulse, Hospital, LogOut, MapPin, MapPinned, Navigation, PhoneCall, Radio, Route, ShieldCheck, Siren, Sparkles, Stethoscope, UserRound, X, Zap } from 'lucide-react';
+import { Activity, Ambulance, Bell, Building2, CircleCheck as CheckCircle2, Clock, Crosshair, Expand, Gauge, HeartPulse, Hospital, LogOut, MapPin, MapPinned, Navigation, PhoneCall, Radio, Route, ShieldCheck, Siren, Sparkles, Stethoscope, UserRound, X, Zap } from 'lucide-react';
 import { MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -305,9 +305,21 @@ function DriverDashboard({ api, user, driver, setDriver, requests, mergeRequest,
               </div>
               <b>{request.priority}</b>
               <div className="actions">
-                <button onClick={() => setRequestStatus(request.id, 'Accepted')}>Accept</button>
-                <button className="ghost" onClick={() => setRequestStatus(request.id, 'Rejected')}>Reject</button>
-                {request.status === 'Accepted' && <button onClick={() => setRequestStatus(request.id, 'Completed')}>Complete</button>}
+                {request.status === 'Pending' && (
+                  <>
+                    <button onClick={() => setRequestStatus(request.id, 'Accepted')}>Accept</button>
+                    <button className="ghost" onClick={() => setRequestStatus(request.id, 'Rejected')}>Reject</button>
+                  </>
+                )}
+                {request.status === 'Accepted' && (
+                  <button onClick={() => setRequestStatus(request.id, 'Completed')}>Complete</button>
+                )}
+                {request.status === 'Rejected' && (
+                  <span className="status-badge rejected">Rejected</span>
+                )}
+                {request.status === 'Completed' && (
+                  <span className="status-badge accepted">Completed</span>
+                )}
               </div>
             </article>
           ))}
