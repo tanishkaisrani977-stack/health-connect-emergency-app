@@ -10,6 +10,8 @@ import {
   createUser,
   findUserByEmail,
   getDriverByUser,
+  getDriverEarnings,
+  getGovernmentSchemes,
   getHospitals,
   initStore,
   listOnlineDrivers,
@@ -91,6 +93,15 @@ app.get('/api/hospitals', requireAuth, async (_req, res) => {
   res.json(await getHospitals());
 });
 
+app.get('/api/schemes', requireAuth, async (req, res) => {
+  res.json(await getGovernmentSchemes(req.query.emergencyType));
+});
+
+app.get('/api/driver/earnings', requireAuth, async (req, res) => {
+  if (req.user.role !== 'driver') return res.status(403).json({ message: 'Drivers only' });
+  res.json(await getDriverEarnings(req.user.id));
+});
+
 app.get('/api/requests', requireAuth, async (req, res) => {
   res.json(await listRequestsForUser(req.user));
 });
@@ -118,10 +129,14 @@ app.patch('/api/driver/status', requireAuth, async (req, res) => {
 });
 
 app.patch('/api/requests/:id/status', requireAuth, async (req, res) => {
-  const request = await updateRequestStatus(req.params.id, req.body.status, req.user.role === 'driver' ? req.user.id : null);
+  const request = await updateRequestStatus(req.params.id, req.body.status, req.user.role === 'driver' ? req.user.id : null, req.body.reason);
   io.to('drivers').emit('request:update', request);
   io.to(`patient:${request.patientId}`).emit('request:update', request);
   if (request.status === 'Accepted') startTracking(request);
+  if (request.status === 'Completed' && req.user.role === 'driver') {
+    const earnings = await getDriverEarnings(req.user.id);
+    io.to('drivers').emit('driver:wallet:update', { driver: earnings.driver, transaction: earnings.transactions[0] });
+  }
   res.json(request);
 });
 

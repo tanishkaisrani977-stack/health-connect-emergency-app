@@ -10,19 +10,54 @@ const dataDir = path.resolve(__dirname, '../data');
 const dataFile = path.join(dataDir, 'db.json');
 
 const hospitalSeed = [
-  { id: 'hosp-aiims', name: 'AIIMS Trauma Centre, Delhi', distance: '2.1 km', beds: 14, icu: 5, trauma: true, region: 'South Delhi', location: { lat: 28.5672, lng: 77.21 } },
-  { id: 'hosp-max-saket', name: 'Max Super Speciality, Saket', distance: '4.7 km', beds: 9, icu: 3, trauma: true, region: 'Saket', location: { lat: 28.5276, lng: 77.2128 } },
-  { id: 'hosp-fortis-noida', name: 'Fortis Hospital, Noida', distance: '8.4 km', beds: 18, icu: 6, trauma: true, region: 'Noida Sector 62', location: { lat: 28.6181, lng: 77.3726 } },
-  { id: 'hosp-medanta', name: 'Medanta The Medicity, Gurugram', distance: '18.2 km', beds: 22, icu: 8, trauma: true, region: 'Gurugram', location: { lat: 28.4399, lng: 77.0419 } },
-  { id: 'hosp-yatharth', name: 'Yatharth Hospital, Greater Noida', distance: '24.8 km', beds: 11, icu: 4, trauma: false, region: 'Greater Noida', location: { lat: 28.4744, lng: 77.503 } }
+  { id: 'hosp-kem', name: 'KEM Hospital, Mumbai', distance: '2.1 km', beds: 14, icu: 5, trauma: true, region: 'Parel, Mumbai', location: { lat: 19.001, lng: 72.8409 } },
+  { id: 'hosp-sion', name: 'Lokmanya Tilak Municipal General Hospital', distance: '4.7 km', beds: 9, icu: 3, trauma: true, region: 'Sion, Mumbai', location: { lat: 19.0432, lng: 72.8644 } },
+  { id: 'hosp-jj', name: 'Sir J. J. Hospital, Mumbai', distance: '8.4 km', beds: 18, icu: 6, trauma: true, region: 'Byculla, Mumbai', location: { lat: 18.9715, lng: 72.833 } },
+  { id: 'hosp-kokilaben', name: 'Kokilaben Dhirubhai Ambani Hospital', distance: '18.2 km', beds: 22, icu: 8, trauma: true, region: 'Andheri West, Mumbai', location: { lat: 19.1316, lng: 72.8256 } },
+  { id: 'hosp-fortis-mulund', name: 'Fortis Hospital, Mulund', distance: '24.8 km', beds: 11, icu: 4, trauma: false, region: 'Mulund West, Mumbai', location: { lat: 19.1726, lng: 72.9561 } }
 ];
 
-const driverLocation = { lat: 28.5843, lng: 77.1639 };
-const patientLocation = { lat: 28.5672, lng: 77.21 };
+// This server-owned catalogue keeps official links and eligibility wording easy to review.
+// It does not collect or store eligibility documents or make eligibility decisions.
+const governmentSchemeSeed = [
+  {
+    id: 'mjpjay',
+    name: 'Mahatma Jyotirao Phule Jan Arogya Yojana (MJPJAY)',
+    description: 'Maharashtra\'s integrated health assurance scheme for identified secondary and tertiary hospital care through empanelled hospitals.',
+    eligibility: 'Potentially relevant for Maharashtra residents. Confirm beneficiary status, eligible treatment package, and hospital empanelment with an Arogyamitra or the official portal.',
+    benefits: 'The official portal describes cashless services for identified hospital treatments, with health coverage up to ₹5 lakh per family per year under the integrated scheme, subject to current official terms and packages.',
+    howToApply: 'Check the official portal or speak with the Arogyamitra at an empanelled hospital. Carry only documents requested by the official service.',
+    website: 'https://www.jeevandayee.gov.in/MJPJAY/index.jsp',
+    appliesTo: ['all']
+  },
+  {
+    id: 'pmjay',
+    name: 'Ayushman Bharat – Pradhan Mantri Jan Arogya Yojana (AB PM-JAY)',
+    description: 'A national health assurance scheme that can help eligible families access cashless treatment at empanelled hospitals.',
+    eligibility: 'Eligibility is not assumed. Check the official beneficiary service, a Common Service Centre, or an empanelled hospital before relying on coverage.',
+    benefits: 'For eligible beneficiaries, the National Health Authority describes health coverage up to ₹5 lakh per family per year at empanelled hospitals, subject to scheme rules and package availability.',
+    howToApply: 'Use the official beneficiary service or visit a Common Service Centre or empanelled hospital to check eligibility and obtain help with the process.',
+    website: 'https://beneficiary.nha.gov.in/',
+    appliesTo: ['all']
+  },
+  {
+    id: 'jssk',
+    name: 'Janani Shishu Suraksha Karyakram (JSSK)',
+    description: 'A National Health Mission initiative for pregnant women and sick newborns or infants using public health institutions.',
+    eligibility: 'Potentially relevant for pregnancy-related emergencies when care is sought at a public health institution. Confirm available services with the receiving public facility.',
+    benefits: 'The National Health Mission lists free and cashless delivery, C-section, medicines, diagnostics, blood where needed, and transport or referral support for covered public-facility care.',
+    howToApply: 'Contact the receiving public health facility or an ASHA worker and ask about JSSK support and referral arrangements.',
+    website: 'https://www.nhm.gov.in/index4.php?lang=1&level=0&lid=171&linkid=150',
+    appliesTo: ['Pregnancy']
+  }
+];
+
+const driverLocation = { lat: 19.0215, lng: 72.8476 };
+const patientLocation = { lat: 19.001, lng: 72.8409 };
 const demoRequests = [
   {
-    id: 'demo-req-noida-critical',
-    patientId: 'walk-in-noida',
+    id: 'demo-req-parel-critical',
+    patientId: 'walk-in-parel',
     patientName: 'Neha Sharma',
     contact: '+91 98111 22334',
     driverId: null,
@@ -31,14 +66,14 @@ const demoRequests = [
     priority: 'Critical',
     distance: '6.2 km',
     eta: 5,
-    region: 'Noida Sector 18',
-    patientLocation: { lat: 28.5708, lng: 77.3261 },
-    driverLocation: { lat: 28.5865, lng: 77.2191 },
+    region: 'Parel, Mumbai',
+    patientLocation: { lat: 19.006, lng: 72.8426 },
+    driverLocation: { lat: 19.0215, lng: 72.8476 },
     createdAt: new Date(Date.now() - 1000 * 60 * 3).toISOString()
   },
   {
-    id: 'demo-req-gurugram-moderate',
-    patientId: 'walk-in-gurugram',
+    id: 'demo-req-andheri-moderate',
+    patientId: 'walk-in-andheri',
     patientName: 'Kabir Malhotra',
     contact: '+91 98990 77881',
     driverId: 'driver-profile-demo',
@@ -47,9 +82,9 @@ const demoRequests = [
     priority: 'Moderate',
     distance: '9.8 km',
     eta: 8,
-    region: 'Cyber Hub, Gurugram',
-    patientLocation: { lat: 28.495, lng: 77.089 },
-    driverLocation: { lat: 28.4595, lng: 77.0266 },
+    region: 'Andheri West, Mumbai',
+    patientLocation: { lat: 19.1316, lng: 72.8256 },
+    driverLocation: { lat: 19.1197, lng: 72.8464 },
     createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString()
   }
 ];
@@ -59,7 +94,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 const driverSchema = new mongoose.Schema(
-  { _id: String, userId: String, name: String, licenseNumber: String, vehicleNumber: String, phone: String, status: String, location: Object, completed: Number },
+  { _id: String, userId: String, name: String, licenseNumber: String, vehicleNumber: String, phone: String, status: String, location: Object, completed: Number, completedRides: Number, totalEarnings: Number, servicePoints: Number, level: String },
   { timestamps: true }
 );
 const requestSchema = new mongoose.Schema(
@@ -72,6 +107,7 @@ const requestSchema = new mongoose.Schema(
     status: String,
     emergencyType: String,
     priority: String,
+    rejectionReason: String,
     distance: String,
     eta: Number,
     patientLocation: Object,
@@ -94,7 +130,19 @@ async function seedJson() {
     db.hospitals = hospitalSeed;
     db.requests = db.requests || [];
     db.drivers = db.drivers || [];
-    db.drivers = db.drivers.map((driver) => driver.id === 'driver-profile-demo' ? { ...driver, location: driverLocation, completed: Math.max(driver.completed || 0, 16) } : driver);
+    db.drivers = db.drivers.map((driver) => driver.id === 'driver-profile-demo' ? {
+      ...driver,
+      licenseNumber: 'MH-042026-AMB',
+      vehicleNumber: 'MH 01 AM 2047',
+      location: driverLocation,
+      completed: Math.max(driver.completed || 0, 16),
+      completedRides: Math.max(driver.completedRides || 0, driver.completed || 0, 16),
+      totalEarnings: driver.totalEarnings || 0,
+      servicePoints: driver.servicePoints || 0,
+      level: driver.level || 'Bronze Responder'
+    } : driver);
+    db.transactions = db.transactions || [];
+    db.requests = db.requests.filter((item) => !['demo-req-noida-critical', 'demo-req-gurugram-moderate'].includes(item.id));
     for (const request of demoRequests) {
       if (!db.requests.some((item) => item.id === request.id)) db.requests.push(request);
     }
@@ -112,12 +160,16 @@ async function seedJson() {
           id: 'driver-profile-demo',
           userId: 'driver-demo',
           name: 'Rohan Singh',
-          licenseNumber: 'DL-042026-AMB',
-          vehicleNumber: 'DL 01 AM 2047',
+          licenseNumber: 'MH-042026-AMB',
+          vehicleNumber: 'MH 01 AM 2047',
           phone: '+91 99887 76655',
           status: 'ONLINE',
           location: driverLocation,
-          completed: 8
+          completed: 8,
+          completedRides: 8,
+          totalEarnings: 0,
+          servicePoints: 0,
+          level: 'Bronze Responder'
         }
       ],
       requests: demoRequests,
@@ -170,12 +222,16 @@ async function seedMongo() {
     _id: 'driver-profile-demo',
     userId: 'driver-demo',
     name: 'Rohan Singh',
-    licenseNumber: 'DL-042026-AMB',
-    vehicleNumber: 'DL 01 AM 2047',
+    licenseNumber: 'MH-042026-AMB',
+    vehicleNumber: 'MH 01 AM 2047',
     phone: '+91 99887 76655',
     status: 'ONLINE',
     location: driverLocation,
-    completed: 8
+    completed: 8,
+    completedRides: 8,
+    totalEarnings: 0,
+    servicePoints: 0,
+    level: 'Bronze Responder'
   });
 }
 
@@ -199,12 +255,16 @@ export async function createUser(payload) {
       id: nanoid(),
       userId: user.id,
       name: user.name,
-      licenseNumber: payload.licenseNumber || 'DL-DEMO-0001',
+      licenseNumber: payload.licenseNumber || 'MH-DEMO-0001',
       vehicleNumber: payload.vehicleNumber || 'AMB-DEMO',
       phone: payload.phone,
       status: 'OFFLINE',
       location: driverLocation,
-      completed: 0
+      completed: 0,
+      completedRides: 0,
+      totalEarnings: 0,
+      servicePoints: 0,
+      level: 'Bronze Responder'
     });
   }
   await saveJson();
@@ -244,7 +304,7 @@ export async function createRequest(payload) {
     priority: payload.priority,
     distance: payload.priority === 'Critical' ? '2.1 km' : '4.6 km',
     eta: priorityEta[payload.priority] || 8,
-    region: 'AIIMS - South Delhi corridor',
+    region: 'KEM Hospital - Parel corridor',
     patientLocation,
     driverLocation,
     createdAt: new Date().toISOString()
@@ -268,17 +328,59 @@ export async function listRequestsForUser(user) {
   return sort([...items]);
 }
 
-export async function updateRequestStatus(id, status, driverUserId) {
+export async function updateRequestStatus(id, status, driverUserId, reason) {
   const driver = driverUserId ? await getDriverByUser(driverUserId) : null;
-  const patch = { status, ...(driver ? { driverId: driver.id } : {}) };
-  if (mode === 'mongo') return normalize(await RequestModel.findOneAndUpdate({ _id: id }, patch, { new: true }));
+  const rewardByPriority = {
+    Critical: { amount: 850, points: 80 },
+    Moderate: { amount: 600, points: 60 },
+    Normal: { amount: 400, points: 40 }
+  };
+  if (mode === 'mongo') {
+    const current = normalize(await RequestModel.findById(id));
+    const reward = status === 'Completed' && driver && current?.status !== 'Completed' ? (rewardByPriority[current.priority] || rewardByPriority.Normal) : null;
+    const patch = { status, ...(driver ? { driverId: driver.id } : {}), ...(status === 'Rejected' && reason ? { rejectionReason: reason } : {}), ...(reward ? { driverEarning: reward.amount, rewardPointsEarned: reward.points } : {}) };
+    const request = normalize(await RequestModel.findOneAndUpdate({ _id: id }, patch, { new: true }));
+    if (reward) {
+      const servicePoints = (driver.servicePoints || 0) + reward.points;
+      const level = servicePoints >= 1000 ? 'Gold Responder' : servicePoints >= 400 ? 'Silver Responder' : 'Bronze Responder';
+      await DriverModel.findByIdAndUpdate(driver.id, { $inc: { completed: 1, completedRides: 1, totalEarnings: reward.amount, servicePoints: reward.points }, $set: { level } });
+    }
+    return request;
+  }
   const request = db.requests.find((item) => item.id === id);
+  const reward = status === 'Completed' && driver && request?.status !== 'Completed' ? (rewardByPriority[request.priority] || rewardByPriority.Normal) : null;
+  const patch = { status, ...(driver ? { driverId: driver.id } : {}), ...(status === 'Rejected' && reason ? { rejectionReason: reason } : {}), ...(reward ? { driverEarning: reward.amount, rewardPointsEarned: reward.points } : {}) };
   if (request) Object.assign(request, patch);
-  if (status === 'Completed' && driver) driver.completed += 1;
+  if (reward) {
+    driver.completed = (driver.completed || 0) + 1;
+    driver.completedRides = (driver.completedRides || driver.completed - 1) + 1;
+    driver.totalEarnings = (driver.totalEarnings || 0) + reward.amount;
+    driver.servicePoints = (driver.servicePoints || 0) + reward.points;
+    driver.level = driver.servicePoints >= 1000 ? 'Gold Responder' : driver.servicePoints >= 400 ? 'Silver Responder' : 'Bronze Responder';
+    db.transactions.unshift({ id: nanoid(), driverId: driver.id, rideId: request.id, amount: reward.amount, servicePoints: reward.points, createdAt: new Date().toISOString() });
+  }
   await saveJson();
   return request;
 }
 
+export async function getDriverEarnings(userId) {
+  const driver = await getDriverByUser(userId);
+  if (!driver) return { driver: null, transactions: [] };
+  if (mode === 'mongo') return { driver, transactions: [] };
+  return { driver, transactions: db.transactions.filter((transaction) => transaction.driverId === driver.id).slice(0, 5) };
+}
+
 export async function getHospitals() {
   return mode === 'mongo' ? hospitalSeed : db.hospitals;
+}
+
+export async function getGovernmentSchemes(emergencyType) {
+  return governmentSchemeSeed
+    .filter((scheme) => scheme.appliesTo.includes('all') || scheme.appliesTo.includes(emergencyType))
+    .map((scheme) => ({
+      ...scheme,
+      recommendation: scheme.appliesTo.includes(emergencyType)
+        ? `Shown because this request is marked as ${emergencyType}. Eligibility is not confirmed.`
+        : 'Shown as a general healthcare-support option. Eligibility is not confirmed.'
+    }));
 }
